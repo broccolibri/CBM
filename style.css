@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: auto;
+    padding: 30px;
+    background: #f7f7f7;
+}
+
+h1 {
+    text-align: center;
+}
+
+#resultat {
+    margin-top: 30px;
+    font-size: 18px;
+    white-space: pre-line;
+}
