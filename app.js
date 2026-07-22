@@ -41,34 +41,21 @@ function analyse(xml) {
 
   let km = 0;
   let hm = 0;
-  let previousElevation = null;
+
+  const elevations = [];
 
   for (let i = 0; i < points.length; i++) {
 
-    const point = points[i];
+    const ele =
+      points[i]
+        .getElementsByTagName("ele")[0];
 
-    const elevationElement =
-      point.getElementsByTagName("ele")[0];
+    if (ele) {
 
-    const elevation =
-      elevationElement
-        ? parseFloat(elevationElement.textContent)
-        : null;
-
-    if (
-      previousElevation !== null &&
-      elevation !== null
-    ) {
-
-      const diff =
-        elevation - previousElevation;
-
-      if (diff > 0) {
-        hm += diff;
-      }
+      elevations.push(
+        parseFloat(ele.textContent)
+      );
     }
-
-    previousElevation = elevation;
 
     if (i > 0) {
 
@@ -84,15 +71,68 @@ function analyse(xml) {
     }
   }
 
-  const distanceBeers = km / 35;
-  const climbingBeers = hm / 800;
+  for (let i = 1; i < elevations.length; i++) {
+
+    const diff =
+      elevations[i] -
+      elevations[i - 1];
+
+    if (diff > 0) {
+      hm += diff;
+    }
+  }
+
+  const biggestClimb =
+    findBiggestClimb(elevations);
+
+  const distanceBeers =
+    km / 35;
+
+  const climbingBeers =
+    hm / 800;
+
+  let bonus = 0;
+
+  if (biggestClimb >= 500)
+    bonus += 1;
+
+  if (biggestClimb >= 1000)
+    bonus += 2;
+
+  if (biggestClimb >= 1500)
+    bonus += 2;
+
+  if (biggestClimb >= 2000)
+    bonus += 3;
 
   const pils = Math.max(
     1,
     Math.round(
-      distanceBeers + climbingBeers
+      distanceBeers +
+      climbingBeers +
+      bonus
     )
   );
+
+  let tittel = "";
+
+  if (pils <= 2)
+    tittel = "Sofapils";
+
+  else if (pils <= 4)
+    tittel = "Torsdagspils";
+
+  else if (pils <= 7)
+    tittel = "Sykkelpils";
+
+  else if (pils <= 10)
+    tittel = "Fjellpils";
+
+  else if (pils <= 15)
+    tittel = "Monsterpils";
+
+  else
+    tittel = "Legendarisk pils";
 
   document.getElementById("resultat")
     .innerHTML = `
@@ -103,15 +143,21 @@ function analyse(xml) {
 
 <p>⛰️ ${Math.round(hm)} hm</p>
 
+<p>🏔️ ${Math.round(biggestClimb)} hm største klatring</p>
+
 <h3>Grunnlag</h3>
 
 <p>• ${distanceBeers.toFixed(1)} pils fra distanse</p>
 
 <p>• ${climbingBeers.toFixed(1)} pils fra høydemeter</p>
 
+<p>• ${bonus.toFixed(1)} pils fra klatrebonus</p>
+
 <h2>${pils} pils</h2>
 
-<p style="font-size: 28px">
+<h3>🏆 ${tittel}</h3>
+
+<p style="font-size:28px">
 ${"🍺".repeat(pils)}
 </p>
 
@@ -119,6 +165,50 @@ ${"🍺".repeat(pils)}
 <strong>DRIKK MED HJELM 🍺⛑️</strong>
 </p>
 `;
+}
+
+function findBiggestClimb(elevations) {
+
+  const DESCENT_THRESHOLD = 30;
+
+  let climbStart = elevations[0];
+  let highest = elevations[0];
+
+  let biggest = 0;
+
+  for (let i = 1; i < elevations.length; i++) {
+
+    const elev = elevations[i];
+
+    if (elev > highest) {
+      highest = elev;
+    }
+
+    if (
+      highest - elev >
+      DESCENT_THRESHOLD
+    ) {
+
+      const climb =
+        highest - climbStart;
+
+      if (climb > biggest) {
+        biggest = climb;
+      }
+
+      climbStart = elev;
+      highest = elev;
+    }
+  }
+
+  const finalClimb =
+    highest - climbStart;
+
+  if (finalClimb > biggest) {
+    biggest = finalClimb;
+  }
+
+  return biggest;
 }
 
 function haversine(
@@ -131,10 +221,12 @@ function haversine(
   const R = 6371;
 
   const dLat =
-    (lat2 - lat1) * Math.PI / 180;
+    (lat2 - lat1) *
+    Math.PI / 180;
 
   const dLon =
-    (lon2 - lon1) * Math.PI / 180;
+    (lon2 - lon1) *
+    Math.PI / 180;
 
   const a =
     Math.sin(dLat / 2) ** 2 +
