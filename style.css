@@ -15,3 +15,16 @@ h1 {
     font-size: 18px;
     white-space: pre-line;
 }
+
+#map {
+    height: 500px;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+}
+
+#resultat {
+    margin-top: 20px;
+}
