@@ -172,7 +172,7 @@ ${"🍺".repeat(pils)}
 
 function findBiggestClimb(elevations) {
 
-  const DESCENT_THRESHOLD = 30;
+  const DESCENT_THRESHOLD = 50;
 
   let climbStart = elevations[0];
   let highest = elevations[0];
