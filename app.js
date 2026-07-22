@@ -77,7 +77,7 @@ function analyse(xml) {
       elevations[i] -
       elevations[i - 1];
 
-    if (diff > 3) {
+    if (diff > 2) {
       hm += diff;
     }
   }
