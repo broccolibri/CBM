@@ -77,9 +77,12 @@ function analyse(xml) {
       elevations[i] -
       elevations[i - 1];
 
-    if (diff > 0) {
-      hm += diff;
+    const ELEVATION_THRESHOLD = 5;
+    
+    if (diff > ELEVATION_THRESHOLD) {
+        hm += diff;
     }
+
   }
 
   const biggestClimb =
