@@ -77,7 +77,7 @@ function analyse(xml) {
       elevations[i] -
       elevations[i - 1];
 
-    const ELEVATION_THRESHOLD = 5;
+    const ELEVATION_THRESHOLD = 1;
     
     if (diff > ELEVATION_THRESHOLD) {
         hm += diff;
