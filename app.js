@@ -58,7 +58,7 @@ function analyser(xml) {
         }
     }
 
-    // Høydemeter
+    // Totale høydemeter
 
     let hm = 0;
 
@@ -72,7 +72,7 @@ function analyser(xml) {
         }
     }
 
-    // Kilometer
+    // Distanse
 
     let km = 0;
 
@@ -102,17 +102,37 @@ function analyser(xml) {
         );
     }
 
+    // Finn klatringer
+
+    const climbs =
+        findClimbs(elevations);
+
+    const biggestClimb =
+        climbs.length > 0
+            ? Math.max(...climbs)
+            : 0;
+
     // Pilsberegning
 
-    const distanceBeers = km / 35;
+    const distanceBeers =
+        km / 35;
 
-    const climbingBeers = hm / 800;
+    const climbingBeers =
+        hm / 800;
 
     let bonus = 0;
 
-    if (hm >= 1000) bonus += 1;
-    if (hm >= 2000) bonus += 2;
-    if (hm >= 4000) bonus += 2;
+    if (biggestClimb >= 500)
+        bonus += 1;
+
+    if (biggestClimb >= 1000)
+        bonus += 2;
+
+    if (biggestClimb >= 1500)
+        bonus += 2;
+
+    if (biggestClimb >= 2000)
+        bonus += 3;
 
     const pils = Math.max(
         1,
@@ -123,62 +143,24 @@ function analyser(xml) {
         )
     );
 
+    // Klatringsliste
+
+    let climbText = "";
+
+    if (climbs.length > 0) {
+
+        const sortedClimbs =
+            [...climbs].sort((a, b) => b - a);
+
+        for (const climb of sortedClimbs) {
+            climbText +=
+                `🏔️ ${Math.round(climb)} hm<br>`;
+        }
+
+    } else {
+
+        climbText =
+            "Ingen store klatringer funnet";
+    }
+
     document.getElementById("resultat")
-        .innerHTML = `
-
-<h2>🍺 Resultat 🍺</h2>
-
-<p>🚴 ${km.toFixed(1)} km</p>
-
-<p>⛰️ ${Math.round(hm)} høydemeter</p>
-
-<h3>Grunnlag</h3>
-
-<p>• ${distanceBeers.toFixed(1)} pils fra distanse</p>
-
-<p>• ${climbingBeers.toFixed(1)} pils fra høydemeter</p>
-
-<p>• ${bonus.toFixed(1)} pils fra klatrebonus</p>
-
-<h2>${pils} pils</h2>
-
-<p style="font-size:28px;">
-${"🍺".repeat(pils)}
-</p>
-
-<p>
-<strong>DRIKK MED HJELM 🍺⛑️</strong>
-</p>
-
-`;
-}
-
-function haversine(
-    lat1,
-    lon1,
-    lat2,
-    lon2
-) {
-
-    const R = 6371;
-
-    const dLat =
-        (lat2 - lat1) * Math.PI / 180;
-
-    const dLon =
-        (lon2 - lon1) * Math.PI / 180;
-
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) ** 2;
-
-    const c =
-        2 * Math.atan2(
-            Math.sqrt(a),
-            Math.sqrt(1 - a)
-        );
-
-    return R * c;
-}
