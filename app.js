@@ -45,7 +45,7 @@ function analyser(xml) {
 
     let elevations = [];
 
-    for (let point of points) {
+    for (const point of points) {
 
         const ele =
             point.getElementsByTagName("ele")[0];
@@ -58,7 +58,7 @@ function analyser(xml) {
         }
     }
 
-    // Totale høydemeter
+    // Høydemeter
 
     let hm = 0;
 
@@ -72,7 +72,7 @@ function analyser(xml) {
         }
     }
 
-    // Distanse
+    // Kilometer
 
     let km = 0;
 
@@ -102,7 +102,7 @@ function analyser(xml) {
         );
     }
 
-    // Finn klatringer
+    // Klatringer
 
     const climbs =
         findClimbs(elevations);
@@ -149,10 +149,13 @@ function analyser(xml) {
 
     if (climbs.length > 0) {
 
-        const sortedClimbs =
-            [...climbs].sort((a, b) => b - a);
+        const sorted =
+            [...climbs].sort(
+                (a, b) => b - a
+            );
 
-        for (const climb of sortedClimbs) {
+        for (const climb of sorted) {
+
             climbText +=
                 `🏔️ ${Math.round(climb)} hm<br>`;
         }
@@ -164,3 +167,9 @@ function analyser(xml) {
     }
 
     document.getElementById("resultat")
+        .innerHTML = `
+
+<h2>🍺 Resultat 🍺</h2>
+
+<p>🚴 ${km.toFixed(1)} km</p>
+
